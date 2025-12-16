@@ -32,6 +32,9 @@ spec:
                 configMapKeyRef:
                   name: www-env
                   key: FORMATION
+          envFrom:
+            - configMapRef:
+                name: www-env
           resources: {}
         - image: php:8.2-fpm
           name: php
