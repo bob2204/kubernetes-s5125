@@ -22,5 +22,13 @@ spec:
       containers:
       - image: bob2606/hello-http:0.8.34
         name: hello-http
+        envFrom:
+          - configMapRef:
+              name: hello-env
+        env:
+          - name: NODENAME
+            valueFrom:
+              fieldRef:
+                fieldPath: spec.nodeName
         resources: {}
 status: {}
