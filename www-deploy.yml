@@ -18,10 +18,13 @@ spec:
         app: www
     spec:
       containers:
-      - image: nginx:1.28
-        name: nginx
-        resources: {}
-      - image: php:8.2-fpm
-        name: php
-        resources: {}
+        - image: nginx:1.28
+          name: nginx
+          env:
+            - name: STAGE
+              value: Kubernetes
+          resources: {}
+        - image: php:8.2-fpm
+          name: php
+          resources: {}
 status: {}
