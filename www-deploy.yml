@@ -27,6 +27,11 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: status.podIP
+            - name: INTERVENTION
+              valueFrom:
+                configMapKeyRef:
+                  name: www-env
+                  key: FORMATION
           resources: {}
         - image: php:8.2-fpm
           name: php
