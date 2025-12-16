@@ -35,6 +35,18 @@ spec:
           envFrom:
             - configMapRef:
                 name: www-env
+          livenessProbe:
+            httpGet:
+              path: /index.html
+              port: 80
+            periodSeconds: 10
+            failureThreshold: 2
+          readinessProbe:
+            httpGet:
+              path: /index.html
+              port: 80
+            periodSeconds: 4
+            failureThreshold: 2
           resources: {}
         - image: php:8.2-fpm
           name: php
