@@ -1,7 +1,8 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  creationTimestamp: null
+  annotations:
+    kubernetes.io/change-cause: ENV version 2
   labels:
     app: hello
   name: hello
@@ -11,7 +12,10 @@ spec:
     matchLabels:
       app: hello
       env: dev
-  strategy: {}
+  strategy:
+    rollingUpdate:
+      maxSurge: 100%
+      maxUnavailable: 50%
   template:
     metadata:
       creationTimestamp: null
@@ -19,13 +23,28 @@ spec:
         app: hello
         env: dev
     spec:
+      initContainers:
+        - name: status
+          image: busybox:1.28
+          volumeMounts:
+            - name: status
+              mountPath: /mnt
+          command:
+            - sh
+            - -c
+            - echo OK > /mnt/status
       containers:
       - image: bob2606/hello-http:0.8.34
         name: hello-http
+        volumeMounts:
+          - name: status
+            mountPath: /var/lib/hello-http
         envFrom:
           - configMapRef:
               name: hello-env
         env:
+          - name: ENV
+            value: Micro-TP n°7 - Version 2
           - name: NODENAME
             valueFrom:
               fieldRef:
@@ -43,4 +62,7 @@ spec:
           periodSeconds: 2
           failureThreshold: 3
         resources: {}
-status: {}
+
+      volumes:
+        - name: status
+          emptyDir:
