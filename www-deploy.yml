@@ -23,6 +23,16 @@ spec:
       labels:
         app: www
     spec:
+      initContainers:
+        - name: create-status
+          image: busybox:1.28
+          volumeMounts:
+            - name: status
+              mountPath: /mnt
+          command:
+            - sh
+            - -c
+            - hostname > /mnt/test.html
       containers:
         - image: nginx:1.28
           name: nginx
@@ -30,6 +40,10 @@ spec:
             - name: data
               mountPath: /usr/share/nginx/html
               subPath: html
+            - name: status
+              mountPath: /usr/share/nginx/html/status
+            - name: nginx-conf
+              mountPath: /etc/nginx/conf.d
           env:
             - name: STAGE
               value: Test-5
@@ -66,9 +80,18 @@ spec:
             - name: data
               mountPath: /var/www/html
               subPath: html
+            - name: status
+              mountPath: /usr/share/nginx/html/status
 
       volumes:
         - name: data
           nfs:
             path: /
             server: 192.168.56.200
+
+        - name: status
+          emptyDir:
+
+        - name: nginx-conf
+          configMap:
+            name: nginx-conf
