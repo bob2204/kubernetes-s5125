@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  annotations:
+    kubernetes.io/change-cause: ENV version 2
+  labels:
+    app: hello
+  name: hello
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: hello
+      env: dev
+  template:
+    metadata:
+      labels:
+        app: hello
+        env: dev
+    spec:
+      initContainers:
+        - name: status
+          image: busybox:1.28
+          volumeMounts:
+            - name: status
+              mountPath: /mnt
+          command:
+            - sh
+            - -c
+            - |
+              rang=$(hostname | cut -d- -f2)
+              if [ $rang = "0" ]
+              then
+                echo "Primaire" > /mnt/status
+              else
+                echo "Secondaire n°$rang" > /mnt/status
+              fi
+      containers:
+      - image: bob2606/hello-http:0.8.34
+        name: hello-http
+        volumeMounts:
+          - name: status
+            mountPath: /var/lib/hello-http
+        envFrom:
+          - configMapRef:
+              name: hello-env
+        env:
+          - name: NODENAME
+            valueFrom:
+              fieldRef:
+                fieldPath: spec.nodeName
+
+      volumes:
+        - name: status
+          emptyDir:
