@@ -62,9 +62,13 @@ spec:
           resources: {}
         - image: php:8.4-fpm
           name: php
+          volumeMounts:
+            - name: data
+              mountPath: /var/www/html
+              subPath: html
 
       volumes:
         - name: data
-          hostPath:
-            path: /home/stagiaire/data
-            type: Directory
+          nfs:
+            path: /
+            server: 192.168.56.200
