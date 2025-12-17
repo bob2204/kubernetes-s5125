@@ -2,15 +2,21 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   creationTimestamp: null
+  annotations:
+    kubernetes.io/change-cause: Test
   labels:
     app: www
   name: www
 spec:
-  replicas: 3
+  replicas: 2
   selector:
     matchLabels:
       app: www
-  strategy: {}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 1
   template:
     metadata:
       creationTimestamp: null
@@ -20,9 +26,15 @@ spec:
       containers:
         - image: nginx:1.28
           name: nginx
+          volumeMounts:
+            - name: data
+              mountPath: /usr/share/nginx/html
+              subPath: html
           env:
             - name: STAGE
-              value: Kubernetes
+              value: Test-5
+            - name: STAGIAIRES
+              value: "7"
             - name: IPADDR
               valueFrom:
                 fieldRef:
@@ -48,7 +60,11 @@ spec:
             periodSeconds: 4
             failureThreshold: 2
           resources: {}
-        - image: php:8.2-fpm
+        - image: php:8.4-fpm
           name: php
-          resources: {}
-status: {}
+
+      volumes:
+        - name: data
+          hostPath:
+            path: /home/stagiaire/data
+            type: Directory
