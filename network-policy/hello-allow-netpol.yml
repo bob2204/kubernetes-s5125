@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: deny-all
+  namespace: default
+spec:
+  podSelector:
+    matchLabels:
+      app: hello
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              inhello: ok
+        - namespaceSelector:
+            matchExpressions:
+              - key: kubernetes.io/metadata.name
+                operator: NotIn
+                values:
+                  - lab
+                  - dev
+                  - preprod
+          podSelector:
+            matchLabels:
+              inhello: ok
