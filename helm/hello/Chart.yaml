@@ -1,0 +1,6 @@
+apiVersion: v2
+name: hello
+description: Démo d'une Chart pour hello
+
+version: 0.0.1
+appVersion: 0.8.39
