@@ -1,0 +1,7 @@
+apiVersion: v1
+data:
+  PORT: "80"
+  VERSION: Base
+kind: ConfigMap
+metadata:
+  name: hello-env

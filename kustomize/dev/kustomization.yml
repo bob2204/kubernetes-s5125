@@ -1,0 +1,58 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - ../base
+  - dev-ns.yml
+
+namePrefix: dev-
+namespace: dev
+
+labels:
+  - pairs:
+      env: dev
+    includeSelectors: true
+  - pairs:
+      status: generated
+    includeSelectors: false
+
+images:
+  - name: bob2606/hello-http
+    newTag: 0.8.39
+
+configMapGenerator:
+  - name: hello-env
+    envs:
+      - dev.env
+
+generatorOptions:
+  labels:
+    status: generated
+  annotations:
+    status: generated
+
+commonAnnotations:
+  status: generated
+
+patches:
+  - path: replicas-deploy.yml
+  - path: resources-deploy.yml
+  - path: env-deploy.yml
+# - path: del-ports-deploy.yml
+#   target:
+#     version: v1
+#     group: apps
+#     kind: Deployment
+#     name: hello
+
+replacements:
+  - source:
+      kind: ConfigMap
+      name: hello-env
+      fieldPath: data.PORT
+    targets:
+      - select:
+          kind: Deployment
+          name: hello
+        fieldPaths:
+          - spec.template.spec.containers.0.ports.0.containerPort 
